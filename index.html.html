@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ordenamos emociones</title>
+<style>
+:root{--ink:#26354a;--blue:#dff2ff;--yellow:#fff3c4;--pink:#ffe2e9;--green:#e1f6e8;--purple:#eee7ff;--line:#d8e1ec}
+*{box-sizing:border-box} body{margin:0;background:#f7faff;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+header{text-align:center;padding:24px 16px 18px;background:linear-gradient(120deg,#dff2ff,#f0eaff)}
+h1{margin:0 0 8px;font-size:clamp(1.7rem,4vw,2.5rem)} header p{margin:0;font-size:1.05rem}
+main{max-width:1050px;margin:0 auto;padding:22px 16px 40px}
+.choose-title{text-align:center;margin:0 0 14px;font-size:1.25rem}
+.task-menu{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.task-button{border:3px solid transparent;border-radius:18px;padding:16px 12px;min-height:112px;font-size:1.15rem;font-weight:bold;cursor:pointer;color:var(--ink);box-shadow:0 3px 0 #dce3ed;transition:transform .15s,border-color .15s}
+.task-button:hover{transform:translateY(-2px);border-color:#9bbce5}
+.task-button .face{display:block;height:62px;margin-bottom:7px}.menu-picto{height:62px;width:62px;object-fit:contain}.tile .symbol img{width:58px;height:58px;object-fit:contain}.image-error{font-size:.75rem;color:#9a3412;text-align:center}.drawing img{display:block;width:100%;height:auto;max-height:220px;object-fit:contain}
+.task-button[aria-expanded="true"]{border-color:#5278bb;box-shadow:0 0 0 3px #dce9ff}
+.t1{background:var(--blue)}.t2{background:var(--pink)}.t3{background:var(--green)}.t4{background:var(--yellow)}
+.activity{display:none;margin-top:22px;background:white;border:2px solid var(--line);border-radius:22px;padding:clamp(16px,3vw,28px);box-shadow:0 8px 24px #243b5310}
+.activity.active{display:block}
+.activity-top{display:flex;gap:22px;align-items:center;justify-content:center;flex-wrap:wrap}
+.drawing{width:190px;max-width:100%;background:#f6f9ff;border-radius:20px;padding:10px;border:2px solid #e4eaf4}
+.drawing svg{width:100%;height:auto;display:block}
+.instruction{text-align:center;font-size:1.1rem;line-height:1.5;max-width:440px}
+.instruction strong{font-size:1.25rem}
+.drop-zone{display:flex;justify-content:center;align-items:stretch;gap:10px;flex-wrap:wrap;margin:22px 0 18px;min-height:116px}
+.slot{width:145px;min-height:108px;border:3px dashed #b9c8dc;border-radius:16px;background:#fbfdff;display:flex;align-items:center;justify-content:center;padding:8px;position:relative}
+.slot:before{content:attr(data-hint);position:absolute;top:5px;left:0;right:0;text-align:center;font-size:.76rem;color:#7b8ba0}
+.slot.filled{border-style:solid;border-color:#91b6e5;background:#f0f7ff}
+.slot .tile{margin-top:14px}
+.bank-title{text-align:center;font-size:1rem;margin:8px 0 10px}
+.tile-bank{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.tile{border:2px solid #d4deeb;background:white;border-radius:15px;padding:10px 12px;min-width:125px;min-height:86px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;cursor:grab;touch-action:manipulation;box-shadow:0 3px 0 #e4eaf1;font-weight:bold;color:var(--ink);user-select:none}
+.tile:active{cursor:grabbing}.tile .symbol{font-size:1.8rem;line-height:1.1}.tile .word{font-size:1.03rem}
+.tile[aria-grabbed="true"]{outline:3px solid #7399d6}
+.actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:20px}
+button.action{border:0;border-radius:13px;padding:12px 20px;font-size:1rem;font-weight:bold;cursor:pointer}
+.check{background:#2869b2;color:white}.reset{background:#eaf0f7;color:#26354a}
+.feedback{text-align:center;font-size:1.1rem;font-weight:bold;min-height:32px;margin-top:16px}
+.feedback.good{color:#197343}.feedback.try{color:#9a5a00}
+.help{text-align:center;color:#64748b;font-size:.92rem;margin:12px 0 0}
+@media(max-width:520px){.slot{width:calc(50% - 8px);min-width:125px}.tile{min-width:100px}.activity-top{gap:12px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🌈 Ordenamos las emociones</h1>
+  <p>Mira el dibujo y coloca los pictogramas en orden para formar la oración.</p>
+</header>
+<main>
+  <h2 class="choose-title">Elige una oración</h2>
+  <div class="task-menu" role="group" aria-label="Elige una emoción">
+    <button class="task-button t1" data-task="triste" aria-expanded="false"><span class="face"><img class="menu-picto" data-picto="triste" alt="" /></span>El niño está triste</button>
+    <button class="task-button t2" data-task="enfadado" aria-expanded="false"><span class="face"><img class="menu-picto" data-picto="enfadado" alt="" /></span>El niño está enfadado</button>
+    <button class="task-button t3" data-task="contento" aria-expanded="false"><span class="face"><img class="menu-picto" data-picto="contento" alt="" /></span>El niño está contento</button>
+    <button class="task-button t4" data-task="sorprendido" aria-expanded="false"><span class="face"><img class="menu-picto" data-picto="sorprendido" alt="" /></span>El niño está sorprendido</button>
+  </div>
+
+  <section class="activity" id="activity" aria-live="polite">
+    <div class="activity-top">
+      <div class="drawing" id="drawing" aria-label="Dibujo de la emoción"></div>
+      <div class="instruction">
+        <strong id="task-heading">El niño está triste</strong>
+        <p>Arrastra cada pictograma a un espacio. También puedes tocar un pictograma y después tocar el espacio donde quieres colocarlo.</p>
+      </div>
+    </div>
+    <div class="drop-zone" id="drop-zone" aria-label="Espacios para ordenar la oración"></div>
+    <p class="bank-title">Pictogramas desordenados</p>
+    <div class="tile-bank" id="tile-bank" aria-label="Pictogramas disponibles"></div>
+    <div class="actions">
+      <button class="action check" id="check">✓ Comprobar</button>
+      <button class="action reset" id="reset">↻ Volver a empezar</button>
+    </div>
+    <div class="feedback" id="feedback" role="status" aria-live="polite"></div>
+    <p class="help">Pista: empieza por «El niño» y termina con la emoción. Los pictogramas se cargan desde la API de ARASAAC; necesitas conexión a internet.</p>
+  </section>
+</main>
+<script>
+const ARASAAC = 'https://api.arasaac.org/v1/pictograms/es/bestsearch/';
+const PIC_BASE = 'https://static.arasaac.org/pictograms/';
+const tasks = {
+ triste:{label:'triste',query:'triste',color:'#dff2ff',detail:'El niño está triste'},
+ enfadado:{label:'enfadado',query:'enfadado',color:'#ffe2e9',detail:'El niño está enfadado'},
+ contento:{label:'contento',query:'contento',color:'#e1f6e8',detail:'El niño está contento'},
+ sorprendido:{label:'sorprendido',query:'sorprendido',color:'#fff3c4',detail:'El niño está sorprendido'}
+};
+const pictoCache = {};
+async function getPicto(term){
+ if(pictoCache[term]) return pictoCache[term];
+ try{
+   const response=await fetch(ARASAAC+encodeURIComponent(term));
+   if(!response.ok) throw new Error('No se pudo consultar ARASAAC');
+   const data=await response.json();
+   const item=Array.isArray(data)?data[0]:data;
+   if(!item) throw new Error('No hay resultados');
+   // La API actual devuelve el identificador en id; algunas respuestas antiguas usan _id.
+   const id=item.id ?? item._id;
+   if(!id) throw new Error('La respuesta no contiene un identificador');
+   const result={id,src:`${PIC_BASE}${id}/${id}_500.png`};
+   pictoCache[term]=result;return result;
+ }catch(e){return null}
+}
+async function fillMenuPictos(){
+ for(const img of document.querySelectorAll('.menu-picto')){
+   const p=await getPicto(img.dataset.picto);
+   if(p){img.src=p.src;img.alt=img.dataset.picto;}
+   else {img.alt='Pictograma '+img.dataset.picto;img.parentElement.textContent=img.dataset.picto;}
+ }
+}
+const words = [
+ {id:'nino',text:'El niño',query:'niño'},
+ {id:'esta',text:'está',query:'estar'}
+];
+let current=null, selectedTile=null;
+const activity=document.getElementById('activity'), zone=document.getElementById('drop-zone'), bank=document.getElementById('tile-bank');
+const feedback=document.getElementById('feedback');
+function makePictoImg(src,alt){const img=document.createElement('img');img.src=src;img.alt=alt;img.loading='lazy';img.onerror=()=>{img.alt=alt+' (no se ha podido cargar)';img.style.display='none';const note=document.createElement('span');note.className='image-error';note.textContent='Pictograma no disponible';img.parentElement?.appendChild(note)};return img;}
+function makeTile(item,picto){
+ const el=document.createElement('div'); el.className='tile'; el.draggable=true; el.tabIndex=0; el.dataset.id=item.id; el.setAttribute('role','button'); el.setAttribute('aria-label','Pictograma '+item.text); el.setAttribute('aria-grabbed','false');
+ const symbol=document.createElement('span');symbol.className='symbol';symbol.appendChild(makePictoImg(picto.src,item.text));
+ const word=document.createElement('span');word.className='word';word.textContent=item.text;
+ el.append(symbol,word);
+ el.addEventListener('dragstart',e=>{e.dataTransfer.setData('text/plain',item.id); selectedTile=item.id; el.setAttribute('aria-grabbed','true')});
+ el.addEventListener('dragend',()=>el.setAttribute('aria-grabbed','false'));
+ el.addEventListener('click',()=>{selectedTile=item.id; document.querySelectorAll('.tile').forEach(t=>t.style.outline='');el.style.outline='3px solid #7399d6';feedback.textContent='Ahora toca el espacio donde quieres colocar «'+item.text+'».';feedback.className='feedback'});
+ el.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();el.click()}});
+ return el;
+}
+async function openTask(id){
+ current=id;selectedTile=null;const task=tasks[id];
+ document.querySelectorAll('.task-button').forEach(b=>b.setAttribute('aria-expanded',String(b.dataset.task===id)));
+ activity.classList.add('active');document.getElementById('task-heading').textContent=task.detail;
+ const drawing=document.getElementById('drawing');drawing.innerHTML='';drawing.style.background=task.color;
+ const emotionPicto=await getPicto(task.query);
+ if(current!==id)return;
+ if(emotionPicto){const img=makePictoImg(emotionPicto.src,'Pictograma ARASAAC: '+task.label);drawing.appendChild(img);}
+ else {drawing.textContent='No se ha podido cargar el pictograma. Comprueba la conexión a internet.';}
+ feedback.textContent='';feedback.className='feedback';zone.innerHTML='';bank.innerHTML='';
+ const items=[...words,{id:'emotion',text:task.label,query:task.query}];
+ const orders={triste:['emotion','nino','esta'],enfadado:['esta','emotion','nino'],contento:['nino','emotion','esta'],sorprendido:['esta','nino','emotion']};
+ const byId=Object.fromEntries(items.map(x=>[x.id,x]));
+ for(let i=0;i<3;i++){
+  const slot=document.createElement('div');slot.className='slot';slot.dataset.hint=['1','2','3'][i];slot.dataset.index=i;slot.setAttribute('aria-label','Espacio '+(i+1));
+  slot.addEventListener('dragover',e=>{e.preventDefault();slot.style.background='#e7f2ff'});
+  slot.addEventListener('dragleave',()=>slot.style.background='');
+  slot.addEventListener('drop',e=>{e.preventDefault();slot.style.background='';placeTile(e.dataTransfer.getData('text/plain'),slot)});
+  slot.addEventListener('click',()=>{if(selectedTile)placeTile(selectedTile,slot)});
+  zone.appendChild(slot);
+ }
+ for(const key of orders[id]){
+   const item=byId[key], p=await getPicto(item.query);
+   if(current!==id)return;
+   if(p)bank.appendChild(makeTile(item,p));
+   else {feedback.textContent='No se pudieron cargar los pictogramas de ARASAAC. Comprueba la conexión a internet.';feedback.className='feedback try';}
+ }
+}
+function placeTile(id,slot){
+ if(!id)return;
+ const tile=[...document.querySelectorAll('.tile')].find(t=>t.dataset.id===id);
+ if(!tile)return;
+ const existing=slot.querySelector('.tile');if(existing)bank.appendChild(existing);
+ zone.querySelectorAll('.slot .tile').forEach(t=>{if(t.dataset.id===id)bank.appendChild(t)});
+ slot.classList.add('filled');slot.appendChild(tile);selectedTile=null;
+ document.querySelectorAll('.tile').forEach(t=>t.style.outline='');feedback.textContent='';feedback.className='feedback';
+}
+document.querySelectorAll('.task-button').forEach(b=>b.addEventListener('click',()=>openTask(b.dataset.task)));
+document.getElementById('check').addEventListener('click',()=>{
+ const slots=[...zone.querySelectorAll('.slot')];const ids=slots.map(s=>s.querySelector('.tile')?.dataset.id||'');
+ if(ids.some(x=>!x)){feedback.textContent='¡Vamos! Coloca los tres pictogramas.';feedback.className='feedback try';return}
+ const correct=['nino','esta','emotion'];
+ if(ids.every((id,i)=>id===correct[i])){feedback.textContent='¡Muy bien! 🎉 «'+tasks[current].detail+'»';feedback.className='feedback good'}
+ else{feedback.textContent='Casi. Mira el dibujo y prueba otro orden.';feedback.className='feedback try'}
+});
+document.getElementById('reset').addEventListener('click',()=>{if(current)openTask(current)});
+fillMenuPictos();
+</script>
+</body>
+</html>
